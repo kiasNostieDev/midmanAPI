@@ -1,7 +1,19 @@
-const express = require('express')
-const app = express()
+const webSocketsServerPort = 8000;
+const webSocketServer = require('ws').Server;
+const http = require('http')
+const app = require('./rest')
 
-const serviceRoute = require('./routes/services')
-app.use('/midAPI', serviceRoute)
+const server = http.createServer()
+const wsServer = new webSocketServer({
+  server: server
+});
 
-app.listen(3000, ()=>console.log('Server is up'))
+server.on('request', app)
+
+wsServer.on('connection', (ws) => {
+    ws.send(JSON.stringify({ answer: 42 }))
+})
+
+server.listen(8000, () => {
+    console.log('listenting by both')
+})
